@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KRID — Frequency. Form. Flow.</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Futuristic sans serif (swap if desired) -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <meta name="description" content="KRID — Hi-Tech Psytrance record label & psywear" />
+</head>
+<body>
+  <div id="app">
+    <!-- INTRO — full-screen animated fractal / nebula -->
+    <header id="intro">
+      <canvas id="fractalCanvas"></canvas>
+      <div class="intro-overlay">
+        <div class="logo" aria-hidden="true">
+          <!-- geometric, luminescent mark -->
+          <svg viewBox="0 0 200 200" role="img" aria-label="KRID mark">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0%" stop-color="#9b59ff" />
+                <stop offset="50%" stop-color="#00ffe1" />
+                <stop offset="100%" stop-color="#7efc00" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(100,100)">
+              <path d="M0 -60 L52 -18 L32 48 L-32 48 L-52 -18 Z" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+              <circle r="6" fill="url(#g1)" />
+            </g>
+          </svg>
+        </div>
+        <h1 class="title">KRID</h1>
+        <p class="tagline">Frequency. Form. Flow.</p>
+        <div class="intro-cta">
+          <button id="enterSite" class="btn">ENTER THE VORTEX</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN (hidden until intro dismissed) -->
+    <main id="mainContent" class="hidden">
+      <nav class="nav-bar" role="navigation" aria-label="Main">
+        <div class="nav-left">
+          <a class="brand" href="#">KRID</a>
+        </div>
+        <ul class="nav-right">
+          <li><a href="#label">Label</a></li>
+          <li><a href="#shop">Shop</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#events">Events</a></li>
+        </ul>
+      </nav>
+
+      <!-- HERO: live visualizer + quick links -->
+      <section id="hero">
+        <div id="audioControls">
+          <input id="fileInput" type="file" accept="audio/*" style="display:none;" />
+          <button id="uploadBtn" class="btn small">Play Local Track</button>
+          <a id="spotifyLink" class="btn small ghost" href="#" target="_blank" rel="noopener">Open on Spotify</a>
+          <a id="soundcloudLink" class="btn small ghost" href="#" target="_blank" rel="noopener">Open on SoundCloud</a>
+        </div>
+        <div id="liveVisualizer" role="img" aria-label="Audio visualizer"></div>
+        <div class="hero-copy">
+          <h2>Hi-Tech Psytrance • Psywear • Frequency Labs</h2>
+          <p>Underground sounds. Cosmic apparel. Transcend with light and bass.</p>
+        </div>
+      </section>
+
+      <!-- RECORD LABEL -->
+      <section id="label" class="panel" aria-labelledby="labelTitle">
+        <h3 id="labelTitle" class="section-title">KRID Records</h3>
+        <div class="label-grid">
+          <aside class="artists">
+            <h4>Artists</h4>
+            <ul id="artistList" class="list" aria-live="polite"></ul>
+          </aside>
+          <div class="releases">
+            <h4>Latest Releases</h4>
+            <div id="releaseList" class="cards" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="calendar-events">
+          <h4>Upcoming Events</h4>
+          <ul id="eventList" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- SHOP -->
+      <section id="shop" class="panel" aria-labelledby="shopTitle">
+        <h3 id="shopTitle" class="section-title">Psywear Collection</h3>
+        <div class="shop-controls">
+          <div class="categories" role="tablist" aria-label="Product categories">
+            <button class="cat-btn active" data-cat="all" role="tab">All</button>
+            <button class="cat-btn" data-cat="hoodies" role="tab">Hoodies</button>
+            <button class="cat-btn" data-cat="tees" role="tab">T-shirts</button>
+            <button class="cat-btn" data-cat="tapestries" role="tab">Tapestries</button>
+            <button class="cat-btn" data-cat="accessories" role="tab">Accessories</button>
+          </div>
+        </div>
+        <div id="productGrid" class="cards product-grid" aria-live="polite"></div>
+
+        <!-- 3D viewer placeholder (swap for three.js or model-viewer) -->
+        <div class="viewer">
+          <div class="viewer-stage" id="viewerStage">
+            <div class="viewer-placeholder">
+              <p>3D Clothing Viewer</p>
+              <p class="muted">(integrate three.js or &lt;model-viewer&gt; here)</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="panel" aria-labelledby="aboutTitle">
+        <h3 id="aboutTitle" class="section-title">About KRID</h3>
+        <div class="about-grid">
+          <div class="about-copy">
+            <p>KRID is a creative platform merging sound, fashion and frequency. Born from underground hi-tech psytrance, KRID curates intense audio experiences and crafts UV-reactive, geometry-driven psywear engineered for the dancefloor and beyond. We are a collective: artists, designers and seekers exploring sound alchemy and inner evolution.</p>
+            <ul>
+              <li><strong>Mission:</strong> Amplify consciousness through bass, light and wearable art.</li>
+              <li><strong>Vision:</strong> A global collective where music becomes light and clothes become portals.</li>
+            </ul>
+          </div>
+          <div class="about-visual">
+            <canvas id="aboutCanvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer id="siteFooter" role="contentinfo">
+        <div class="footer-grid">
+          <div class="socials">
+            <h5>Stay tuned</h5>
+            <div class="icons">
+              <a href="#" aria-label="Instagram" class="icon" target="_blank">IG</a>
+              <a href="#" aria-label="SoundCloud" class="icon" target="_blank">SC</a>
+              <a href="#" aria-label="Spotify" class="icon" target="_blank">SP</a>
+              <a href="#" aria-label="YouTube" class="icon" target="_blank">YT</a>
+            </div>
+          </div>
+          <div class="mailing">
+            <h5>Mailing List</h5>
+            <form id="mailForm">
+              <input id="email" type="email" placeholder="your frequency@domain" required />
+              <button class="btn" type="submit">Subscribe</button>
+            </form>
+          </div>
+          <div class="mini-visualizer">
+            <h5>Visualizer</h5>
+            <canvas id="footerViz" width="300" height="120" aria-hidden="true"></canvas>
+          </div>
+        </div>
+        <div class="copyright">© <span id="year"></span> KRID — All Rights Reserved</div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
