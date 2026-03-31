@@ -98,6 +98,13 @@ body{
   animation:slow-spin 24s linear infinite;
 }
 
+.nav-logo {
+  height: 50px;       /* Adjust size */
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 0 6px rgba(0,255,225,0.4));
+}
+
 .sigil{
   fill:rgba(0,0,0,0.3);
   stroke:url(#sigilStroke);
