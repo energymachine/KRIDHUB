@@ -1,209 +1,400 @@
-// KRID — frontend prototype script
-// Handles: intro dismissal, fractal & visualizer, sample data for artists/releases/products
+// KRID — hi‑tech psy front-end
 
 // ---------- SAMPLE DATA ----------
 const sampleArtists = [
-  {id:1,name:'Spectral Circuit',bio:'Hi-Tech maestro exploring micro-frequencies',links:{spotify:'#',soundcloud:'#'}},
-  {id:2,name:'Vexion',bio:'Dark, rhythmic, precise',links:{spotify:'#',soundcloud:'#'}},
-  {id:3,name:'NexuSphere',bio:'Melodic layers and crystalline textures',links:{spotify:'#',soundcloud:'#'}}
+  { id:1, name:'Spectral Circuit', bio:'Hi‑tech architect bending micro‑frequencies.' },
+  { id:2, name:'Vexion',          bio:'Dark, angular and surgical night textures.' },
+  { id:3, name:'NexuSphere',      bio:'Crystalline layers and elastic bass scripts.' }
 ];
 
 const sampleReleases = [
-  {id:1,title:'Pulse Protocol',artist:'Spectral Circuit',preview:'#',spotify:'#',soundcloud:'#'},
-  {id:2,title:'Fractal Bloom',artist:'NexuSphere',preview:'#',spotify:'#',soundcloud:'#'},
-  {id:3,title:'CyberSeed',artist:'Vexion',preview:'#',spotify:'#',soundcloud:'#'}
+  { id:1, title:'Pulse Protocol',  artist:'Spectral Circuit' },
+  { id:2, title:'Fractal Bloom',   artist:'NexuSphere' },
+  { id:3, title:'CyberSeed',       artist:'Vexion' }
 ];
 
 const sampleProducts = [
-  {id:1,cat:'hoodies',title:'Lumina Hoodie',price:'$84',desc:'UV-reactive fractal print, breathable blend'},
-  {id:2,cat:'tees',title:'Frequency Tee',price:'$28',desc:'Geometry print with iridescent ink'},
-  {id:3,cat:'tapestries',title:'Nebula Tapestry',price:'$56',desc:'160x120cm vivid dye-sublimation'},
-  {id:4,cat:'accessories',title:'Pulse Cap',price:'$24',desc:'Reflective trims and embroidered sigil'}
+  { id:1, cat:'hoodies',     title:'Lumina Hoodie',    price:'₹6,999', desc:'UV‑reactive fractal grid print.' },
+  { id:2, cat:'tees',        title:'Frequency Tee',    price:'₹1,999', desc:'Geometric wave‑field in iridescent ink.' },
+  { id:3, cat:'tapestries',  title:'Nebula Tapestry',  price:'₹4,299', desc:'Hi‑resolution psy nebula wall‑portal.' },
+  { id:4, cat:'accessories', title:'Pulse Cap',        price:'₹1,499', desc:'Reflective trims and KRID sigil.' }
 ];
 
 // ---------- INTRO FRACTAL CANVAS ----------
 const introCanvas = document.getElementById('fractalCanvas');
 const introCtx = introCanvas.getContext('2d');
-function resizeIntro(){introCanvas.width = innerWidth; introCanvas.height = innerHeight}
+
+function resizeIntro() {
+  introCanvas.width = innerWidth;
+  introCanvas.height = innerHeight;
+}
 window.addEventListener('resize', resizeIntro);
 resizeIntro();
 
-let t=0;
-function drawFractal(){
+let t = 0;
+function drawFractal() {
   const w = introCanvas.width, h = introCanvas.height;
-  const image = introCtx.createImageData(w,h);
-  // coarse rendering for performance — produces nebula-like swirls
-  for(let y=0;y<h;y+=4){
-    for(let x=0;x<w;x+=4){
-      const nx = x/w, ny = y/h;
-      const v = Math.abs(Math.sin((nx*12 + t*0.3) + Math.sin(ny*7 + t*0.2)));
-      const r = Math.floor(30 + v*200);
-      const g = Math.floor(10 + v*150);
-      const b = Math.floor(40 + v*220);
-      for(let yy=0;yy<4;yy++){
-        for(let xx=0;xx<4;xx++){
-          const idx = 4*((y+yy)*w + (x+xx));
-          image.data[idx] = r;
-          image.data[idx+1] = g;
-          image.data[idx+2] = b;
-          image.data[idx+3] = 28 + Math.floor(v*120);
+  const img = introCtx.createImageData(w, h);
+  const data = img.data;
+
+  for (let y = 0; y < h; y += 2) {
+    for (let x = 0; x < w; x += 2) {
+      const nx = (x - w / 2) / Math.min(w, h);
+      const ny = (y - h / 2) / Math.min(w, h);
+      const r = Math.sqrt(nx * nx + ny * ny);
+      const ang = Math.atan2(ny, nx);
+
+      const v = Math.sin(12 * r * r - t * 0.04 + Math.cos(ang * 6));
+      const hue = 200 + 90 * v;
+      const sat = 80 + 20 * v;
+      const val = 8 + 40 * (1 - r);
+
+      const c = hsvToRgb(hue, sat / 100, Math.max(0, val / 100));
+      const idx = (y * w + x) * 4;
+      for (let dy = 0; dy < 2; dy++) {
+        for (let dx = 0; dx < 2; dx++) {
+          const id2 = ((y + dy) * w + (x + dx)) * 4;
+          data[id2] = c.r;
+          data[id2 + 1] = c.g;
+          data[id2 + 2] = c.b;
+          data[id2 + 3] = 255;
         }
       }
     }
   }
-  introCtx.putImageData(image,0,0);
-  t += 0.008;
+  introCtx.putImageData(img, 0, 0);
+  t += 1.1;
   requestAnimationFrame(drawFractal);
 }
 requestAnimationFrame(drawFractal);
 
-// ---------- INTRO BUTTON ----------
-const enterBtn = document.getElementById('enterSite');
-enterBtn.addEventListener('click',()=>{
-  document.getElementById('intro').style.transition = 'opacity 0.8s ease';
-  document.getElementById('intro').style.opacity = '0';
-  setTimeout(()=>{
-    document.getElementById('intro').style.display='none';
+function hsvToRgb(h, s, v) {
+  const c = v * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = v - c;
+  let r1, g1, b1;
+  if (h < 60) { r1 = c; g1 = x; b1 = 0; }
+  else if (h < 120) { r1 = x; g1 = c; b1 = 0; }
+  else if (h < 180) { r1 = 0; g1 = c; b1 = x; }
+  else if (h < 240) { r1 = 0; g1 = x; b1 = c; }
+  else if (h < 300) { r1 = x; g1 = 0; b1 = c; }
+  else { r1 = c; g1 = 0; b1 = x; }
+  return {
+    r: Math.round((r1 + m) * 255),
+    g: Math.round((g1 + m) * 255),
+    b: Math.round((b1 + m) * 255)
+  };
+}
+
+// intro button
+document.getElementById('enterSite').addEventListener('click', () => {
+  const intro = document.getElementById('intro');
+  intro.style.transition = 'opacity 0.8s ease';
+  intro.style.opacity = '0';
+  setTimeout(() => {
+    intro.style.display = 'none';
     document.getElementById('mainContent').classList.remove('hidden');
-  },900);
+  }, 900);
 });
 
-// ---------- POPULATE SAMPLE CONTENT ----------
-function populateArtists(){
+// ---------- POPULATE CONTENT ----------
+function populateArtists() {
   const el = document.getElementById('artistList');
-  sampleArtists.forEach(a=>{
+  el.innerHTML = '';
+  sampleArtists.forEach(a => {
     const li = document.createElement('li');
-    li.innerHTML = `<strong>${a.name}</strong><div class="muted">${a.bio}</div>`;
+    li.innerHTML = `
+      <span class="name">${a.name}</span>
+      <span class="bio">${a.bio}</span>
+    `;
     el.appendChild(li);
   });
 }
-function populateReleases(){
+
+function populateReleases() {
   const el = document.getElementById('releaseList');
-  sampleReleases.forEach(r=>{
-    const card = document.createElement('div'); card.className='card';
-    card.innerHTML = `<strong>${r.title}</strong><div class="muted">by ${r.artist}</div>
-      <div style="margin-top:8px;">
-        <button class='btn small play' data-id='${r.id}'>▶ Preview</button>
-        <a class='btn small ghost' href='${r.spotify}'>Spotify</a>
-        <a class='btn small ghost' href='${r.soundcloud}'>SoundCloud</a>
-      </div>`;
+  el.innerHTML = '';
+  sampleReleases.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-title">${r.title}</div>
+      <div class="card-artist">by ${r.artist}</div>
+      <div class="card-actions">
+        <button class="play-pill play">▶ Preview</button>
+        <button class="play-pill">Spotify</button>
+        <button class="play-pill">SoundCloud</button>
+      </div>
+    `;
     el.appendChild(card);
   });
 }
-function populateProducts(filter='all'){
-  const el=document.getElementById('productGrid'); el.innerHTML='';
-  sampleProducts.filter(p=>filter==='all'||p.cat===filter).forEach(p=>{
-    const d=document.createElement('div'); d.className='product';
-    d.innerHTML=`<strong>${p.title}</strong><div class='muted' style='margin:6px 0'>${p.desc}</div>
-      <div style='display:flex;justify-content:space-between;align-items:center'><span>${p.price}</span><button class='btn small'>Add</button></div>`;
-    el.appendChild(d);
-  });
+
+function populateProducts(filter='all') {
+  const el = document.getElementById('productGrid');
+  el.innerHTML = '';
+  sampleProducts
+    .filter(p => filter === 'all' || p.cat === filter)
+    .forEach(p => {
+      const d = document.createElement('div');
+      d.className = 'product';
+      d.innerHTML = `
+        <div class="product-title">${p.title}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <span class="product-price">${p.price}</span>
+          <button class="product-add">Add</button>
+        </div>
+      `;
+      el.appendChild(d);
+    });
 }
 
-populateArtists(); populateReleases(); populateProducts();
+populateArtists();
+populateReleases();
+populateProducts();
 
-// category buttons
-document.querySelectorAll('.cat-btn').forEach(btn=>btn.addEventListener('click',ev=>{
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  populateProducts(btn.dataset.cat);
-}));
+// category filter buttons
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    populateProducts(btn.dataset.cat);
+  });
+});
 
-// ---------- AUDIO VISUALIZER (Web Audio) ----------
+// ---------- AUDIO VISUALIZER ----------
 const liveViz = document.getElementById('liveVisualizer');
 let audioCtx, analyser, source;
-function setupAudioAnalyser(){
-  if(audioCtx) return;
+
+function setupAudioAnalyser() {
+  if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 1024;
-}
 
-// canvas bars
-const vizCanvas = document.createElement('canvas');
-vizCanvas.width = 1400; vizCanvas.height = 260; liveViz.appendChild(vizCanvas);
-const vctx = vizCanvas.getContext('2d');
-function drawViz(){
-  requestAnimationFrame(drawViz);
-  if(!analyser) return;
-  const freq = new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteFrequencyData(freq);
-  vctx.clearRect(0,0,vizCanvas.width,vizCanvas.height);
-  const w = vizCanvas.width; const h = vizCanvas.height;
-  const barCount = 128; const step = Math.floor(freq.length/barCount);
-  for(let i=0;i<barCount;i++){
-    const value = freq[i*step]/255;
-    const barH = value*h*1.2;
-    const x = i*(w/barCount);
-    const grad = vctx.createLinearGradient(x,0,x,barH);
-    grad.addColorStop(0,'rgba(122,59,255,0.9)');
-    grad.addColorStop(0.5,'rgba(0,255,225,0.7)');
-    grad.addColorStop(1,'rgba(57,255,20,0.5)');
-    vctx.fillStyle = grad;
-    vctx.fillRect(x,h-barH,(w/barCount)-2,barH);
+  const vizCanvas = document.createElement('canvas');
+  vizCanvas.width = liveViz.clientWidth * 2;
+  vizCanvas.height = liveViz.clientHeight * 2;
+  liveViz.appendChild(vizCanvas);
+  const vctx = vizCanvas.getContext('2d');
+
+  function drawViz() {
+    requestAnimationFrame(drawViz);
+    if (!analyser) return;
+
+    const freq = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(freq);
+
+    const w = vizCanvas.width;
+    const h = vizCanvas.height;
+    vctx.setTransform(1,0,0,1,0,0);
+    vctx.clearRect(0,0,w,h);
+
+    const barCount = 120;
+    const step = Math.floor(freq.length / barCount);
+    const centerX = w / 2;
+    const centerY = h / 2;
+    const radiusBase = Math.min(w, h) * 0.15;
+
+    for (let i = 0; i < barCount; i++) {
+      const v = freq[i * step] / 255;
+      const angle = (i / barCount) * Math.PI * 2;
+      const r = radiusBase + v * 160;
+
+      const x = centerX + Math.cos(angle) * r;
+      const y = centerY + Math.sin(angle) * r;
+
+      const grad = vctx.createLinearGradient(centerX, centerY, x, y);
+      grad.addColorStop(0, `rgba(176,0,255,0.1)`);
+      grad.addColorStop(1, `rgba(0,255,225,${0.7 * v + 0.3})`);
+
+      vctx.beginPath();
+      vctx.moveTo(centerX, centerY);
+      vctx.lineTo(x, y);
+      vctx.strokeStyle = grad;
+      vctx.lineWidth = 1.2;
+      vctx.stroke();
+    }
   }
+  requestAnimationFrame(drawViz);
 }
-requestAnimationFrame(drawViz);
 
-// play local file
-const fileInput = document.getElementById('fileInput');
-const uploadBtn = document.getElementById('uploadBtn');
-uploadBtn.addEventListener('click',()=>fileInput.click());
-fileInput.addEventListener('change',async(e)=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  setupAudioAnalyser();
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = await audioCtx.decodeAudioData(arrayBuffer);
-  if(source) source.disconnect();
-  source = audioCtx.createBufferSource();
-  source.buffer = buffer; source.loop = true;
-  source.connect(analyser); analyser.connect(audioCtx.destination);
-  source.start(0);
+// track loader
+document.getElementById('loadTrack').addEventListener('click', () => {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'audio/*';
+  fileInput.style.display = 'none';
+  document.body.appendChild(fileInput);
+  fileInput.click();
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setupAudioAnalyser();
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = await audioCtx.decodeAudioData(arrayBuffer);
+    if (source) source.disconnect();
+    source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    source.start(0);
+  }, { once:true });
 });
 
 // ---------- FOOTER VISUALIZER ----------
 const footerCanvas = document.getElementById('footerViz');
 const fctx = footerCanvas.getContext('2d');
-let fT=0;
-function drawFooter(){
-  fctx.clearRect(0,0,footerCanvas.width,footerCanvas.height);
-  for(let i=0;i<6;i++){
-    const x = i*(footerCanvas.width/6)+20;
-    const y = footerCanvas.height/2 + Math.sin(fT+i*0.8)*24;
-    fctx.beginPath(); fctx.arc(x,y,6,0,Math.PI*2); fctx.fillStyle='rgba(122,59,255,0.9)'; fctx.fill();
+let fT = 0;
+
+function drawFooter() {
+  const w = footerCanvas.width;
+  const h = footerCanvas.height;
+  fctx.clearRect(0, 0, w, h);
+
+  for (let i = 0; i < 6; i++) {
+    const x = i * (w / 6) + 20;
+    const y = h / 2 + Math.sin(fT + i * 0.8) * 12;
+    fctx.beginPath();
+    fctx.arc(x, y, 5, 0, Math.PI * 2);
+    fctx.fillStyle = `rgba(176,0,255,${0.5 + 0.3 * Math.sin(fT + i)})`;
+    fctx.fill();
   }
-  fT += 0.08; requestAnimationFrame(drawFooter);
+
+  fT += 0.08;
+  requestAnimationFrame(drawFooter);
 }
 requestAnimationFrame(drawFooter);
 
-// ---------- ABOUT CANVAS (gentle motion) ----------
+// ---------- ABOUT CANVAS ----------
 const aboutCanvas = document.getElementById('aboutCanvas');
 const aCtx = aboutCanvas.getContext('2d');
-function resizeAbout(){aboutCanvas.width = aboutCanvas.clientWidth; aboutCanvas.height = aboutCanvas.clientHeight}
-resizeAbout(); window.addEventListener('resize',resizeAbout);
-let aT=0;
-function drawAbout(){
-  aCtx.clearRect(0,0,aboutCanvas.width,aboutCanvas.height);
-  const w=aboutCanvas.width,h=aboutCanvas.height;
-  for(let i=0;i<4;i++){
+
+function resizeAbout() {
+  aboutCanvas.width = aboutCanvas.clientWidth;
+  aboutCanvas.height = aboutCanvas.clientHeight;
+}
+resizeAbout();
+window.addEventListener('resize', resizeAbout);
+
+let aT = 0;
+function drawAbout() {
+  const w = aboutCanvas.width;
+  const h = aboutCanvas.height;
+  aCtx.clearRect(0, 0, w, h);
+
+  const cx = w / 2;
+  const cy = h / 2;
+
+  for (let i = 0; i < 8; i++) {
     aCtx.beginPath();
-    aCtx.strokeStyle = `rgba(122,59,255,${0.12 + i*0.06})`;
-    aCtx.lineWidth = 2 + i*1.5;
-    aCtx.arc(w/2, h/2, 40 + i*30 + Math.sin(aT*(0.5+i*0.2))*8, 0, Math.PI*2);
+    const r = 40 + i * 18 + Math.sin(aT * (0.7 + i * 0.1)) * 6;
+    const sides = 3 + (i % 4);
+    const angleStep = (Math.PI * 2) / sides;
+    aCtx.strokeStyle = `rgba(0,255,225,${0.15 + i * 0.06})`;
+    aCtx.lineWidth = 1 + i * 0.2;
+
+    for (let j = 0; j <= sides; j++) {
+      const ang = j * angleStep + aT * 0.2 * (i % 2 === 0 ? 1 : -1);
+      const x = cx + Math.cos(ang) * r;
+      const y = cy + Math.sin(ang) * r;
+      if (j === 0) aCtx.moveTo(x, y);
+      else aCtx.lineTo(x, y);
+    }
     aCtx.stroke();
   }
-  aT += 0.02; requestAnimationFrame(drawAbout);
+
+  aT += 0.02;
+  requestAnimationFrame(drawAbout);
 }
 requestAnimationFrame(drawAbout);
 
+// ---------- VIEWER "CUBE" ----------
+const viewerCanvas = document.getElementById('viewerCanvas');
+const v2 = viewerCanvas.getContext('2d');
+
+function resizeViewer() {
+  const rect = viewerCanvas.getBoundingClientRect();
+  viewerCanvas.width = rect.width * 2;
+  viewerCanvas.height = rect.height * 2;
+}
+resizeViewer();
+window.addEventListener('resize', resizeViewer);
+
+let vcT = 0;
+function drawViewer() {
+  const w = viewerCanvas.width;
+  const h = viewerCanvas.height;
+  v2.clearRect(0, 0, w, h);
+
+  const cx = w / 2;
+  const cy = h / 2;
+  const size = Math.min(w, h) * 0.22;
+  const tilt = Math.sin(vcT * 0.4) * 0.4;
+
+  v2.save();
+  v2.translate(cx, cy);
+  v2.rotate(tilt);
+
+  const faces = 4;
+  for (let i = 0; i < faces; i++) {
+    const ang = (i / faces) * Math.PI * 2 + vcT * 0.4;
+    const depth = 0.4 + 0.6 * Math.sin(vcT + i);
+    const x = Math.cos(ang) * size * 0.4;
+    const y = Math.sin(ang) * size * 0.4;
+
+    v2.beginPath();
+    v2.rect(-size/2 + x, -size/2 + y, size, size);
+    const grd = v2.createLinearGradient(-size, -size, size, size);
+    grd.addColorStop(0, `rgba(176,0,255,${0.2 + depth})`);
+    grd.addColorStop(1, `rgba(0,255,225,${0.2 + depth})`);
+    v2.fillStyle = grd;
+    v2.strokeStyle = 'rgba(255,255,255,0.6)';
+    v2.lineWidth = 2;
+    v2.fill();
+    v2.stroke();
+  }
+
+  v2.restore();
+
+  vcT += 0.02;
+  requestAnimationFrame(drawViewer);
+}
+requestAnimationFrame(drawViewer);
+
 // ---------- MISC ----------
 document.getElementById('year').textContent = new Date().getFullYear();
-document.getElementById('mailForm').addEventListener('submit',e=>{e.preventDefault();alert('Subscribed — welcome to the frequency.');e.target.reset();});
 
-// placeholder preview handler
-document.addEventListener('click',e=>{
-  if(e.target.classList.contains('play')){
-    alert('Preview would play here. Integrate per-track streaming via the Web Audio API or embed players.');
+document.getElementById('mailForm').addEventListener('submit', e => {
+  e.preventDefault();
+  alert('Subscribed — KRID transmissions armed.');
+  e.target.reset();
+});
+
+// placeholder preview
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('play')) {
+    alert('Preview audio would play here. Patch to streaming / Web Audio as needed.');
   }
+});
+
+// psychedelic triggers
+document.querySelectorAll('.btn-trigger').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const type = btn.dataset.trigger;
+    if (type === 'warp') {
+      document.body.classList.remove('body-strobe');
+      void document.body.offsetWidth;
+      document.body.classList.add('body-warp');
+      setTimeout(() => document.body.classList.remove('body-warp'), 1300);
+    } else if (type === 'strobe') {
+      document.body.classList.remove('body-warp');
+      void document.body.offsetWidth;
+      document.body.classList.add('body-strobe');
+      setTimeout(() => document.body.classList.remove('body-strobe'), 900);
+    }
+  });
 });
